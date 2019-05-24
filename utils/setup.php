@@ -44,7 +44,7 @@ $aCMDOptions
    array('create-search-indices', '', 0, 1, 0, 0, 'bool', 'Create additional indices required for search and update'),
    array('create-country-names', '', 0, 1, 0, 0, 'bool', 'Create default list of searchable country names'),
    array('drop', '', 0, 1, 0, 0, 'bool', 'Drop tables needed for updates, making the database readonly (EXPERIMENTAL)'),
-   array('drop-data', '', 0, 1, 0, 0, 'bool', 'Drop data in tables needed for import additional countries (EXPERIMENTAL)'),
+   array('drop-data-off', '', 0, 1, 0, 0, 'bool', 'Drop data in tables needed for import additional countries (EXPERIMENTAL)'),
   );
 
 // $aCMDOptions passed to getCmdOpt by reference
@@ -120,7 +120,7 @@ if ($aCMDResult['import-wikipedia-articles'] || $aCMDResult['all']) {
 
 if ($aCMDResult['load-data'] || $aCMDResult['all']) {
     $bDidSomething = true;
-    $oSetup->loadData($aCMDResult['disable-token-precalc'], !$aCMDResult['drop-data']);
+    $oSetup->loadData($aCMDResult['disable-token-precalc'], !$aCMDResult['drop-data-off']);
 }
 
 if ($aCMDResult['import-tiger-data']) {
