@@ -348,47 +348,49 @@ class SetupFunctions
         }
     }
 
-    public function loadData($bDisableTokenPrecalc)
+    public function loadData($bDisableTokenPrecalc, $dropData = true)
     {
-        info('Drop old Data');
+        if($dropData) {
+            info('Drop old Data');
 
-        $this->pgExec('TRUNCATE word');
-        echo '.';
-        $this->pgExec('TRUNCATE placex');
-        echo '.';
-        $this->pgExec('TRUNCATE location_property_osmline');
-        echo '.';
-        $this->pgExec('TRUNCATE place_addressline');
-        echo '.';
-        $this->pgExec('TRUNCATE place_boundingbox');
-        echo '.';
-        $this->pgExec('TRUNCATE location_area');
-        echo '.';
-        if (!$this->dbReverseOnly()) {
-            $this->pgExec('TRUNCATE search_name');
+            $this->pgExec('TRUNCATE word');
             echo '.';
-        }
-        $this->pgExec('TRUNCATE search_name_blank');
-        echo '.';
-        $this->pgExec('DROP SEQUENCE seq_place');
-        echo '.';
-        $this->pgExec('CREATE SEQUENCE seq_place start 100000');
-        echo '.';
-
-        $sSQL = 'select distinct partition from country_name';
-        $aPartitions = $this->oDB->getCol($sSQL);
-
-        if (!$this->bNoPartitions) $aPartitions[] = 0;
-        foreach ($aPartitions as $sPartition) {
-            $this->pgExec('TRUNCATE location_road_'.$sPartition);
+            $this->pgExec('TRUNCATE placex');
             echo '.';
-        }
+            $this->pgExec('TRUNCATE location_property_osmline');
+            echo '.';
+            $this->pgExec('TRUNCATE place_addressline');
+            echo '.';
+            $this->pgExec('TRUNCATE place_boundingbox');
+            echo '.';
+            $this->pgExec('TRUNCATE location_area');
+            echo '.';
+            if (!$this->dbReverseOnly()) {
+                $this->pgExec('TRUNCATE search_name');
+                echo '.';
+            }
+            $this->pgExec('TRUNCATE search_name_blank');
+            echo '.';
+            $this->pgExec('DROP SEQUENCE seq_place');
+            echo '.';
+            $this->pgExec('CREATE SEQUENCE seq_place start 100000');
+            echo '.';
 
-        // used by getorcreate_word_id to ignore frequent partial words
-        $sSQL = 'CREATE OR REPLACE FUNCTION get_maxwordfreq() RETURNS integer AS ';
-        $sSQL .= '$$ SELECT '.CONST_Max_Word_Frequency.' as maxwordfreq; $$ LANGUAGE SQL IMMUTABLE';
-        $this->pgExec($sSQL);
-        echo ".\n";
+            $sSQL = 'select distinct partition from country_name';
+            $aPartitions = $this->oDB->getCol($sSQL);
+
+            if (!$this->bNoPartitions) $aPartitions[] = 0;
+            foreach ($aPartitions as $sPartition) {
+                $this->pgExec('TRUNCATE location_road_' . $sPartition);
+                echo '.';
+            }
+
+            // used by getorcreate_word_id to ignore frequent partial words
+            $sSQL = 'CREATE OR REPLACE FUNCTION get_maxwordfreq() RETURNS integer AS ';
+            $sSQL .= '$$ SELECT ' . CONST_Max_Word_Frequency . ' as maxwordfreq; $$ LANGUAGE SQL IMMUTABLE';
+            $this->pgExec($sSQL);
+            echo ".\n";
+        }
 
         // pre-create the word list
         if (!$bDisableTokenPrecalc) {
