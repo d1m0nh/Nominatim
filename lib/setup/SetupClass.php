@@ -576,6 +576,7 @@ class SetupFunctions
         $this->pgExec($sSQL);
 
         if (CONST_Use_Extra_US_Postcodes) {
+            info('Use extra US postcodes');
             // only add postcodes that are not yet available in OSM
             $sSQL  = 'INSERT INTO location_postcode';
             $sSQL .= ' (place_id, indexed_status, country_code, postcode, geometry) ';
@@ -587,6 +588,7 @@ class SetupFunctions
             $this->pgExec($sSQL);
         }
 
+        info('Add missing postcodes for GB (if available)');
         // add missing postcodes for GB (if available)
         $sSQL  = 'INSERT INTO location_postcode';
         $sSQL .= ' (place_id, indexed_status, country_code, postcode, geometry) ';
@@ -597,14 +599,18 @@ class SetupFunctions
         $this->pgExec($sSQL);
 
         if (!$bCMDResultAll) {
+            info('Delete words if not in postcodes');
             $sSQL = "DELETE FROM word WHERE class='place' and type='postcode'";
             $sSQL .= 'and word NOT IN (SELECT postcode FROM location_postcode)';
             $this->pgExec($sSQL);
         }
 
+        info('Get or create postcode id');
         $sSQL = 'SELECT count(getorcreate_postcode_id(v)) FROM ';
         $sSQL .= '(SELECT distinct(postcode) as v FROM location_postcode) p';
         $this->pgExec($sSQL);
+
+        info('Calculate postcodes finished');
     }
 
     public function index($bIndexNoanalyse)
